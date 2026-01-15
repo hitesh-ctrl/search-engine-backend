@@ -11,7 +11,7 @@ const indexDocument = async(document) => {
         frequencyMap[token] = (frequencyMap[token] || 0) +1; 
     }
 
-    for(const [term, frequency] of Object,entries(frequencyMap)){
+    for(const [term, frequency] of Object.entries(frequencyMap)){
         await index,updateOne(
             {term},
             {
@@ -21,7 +21,7 @@ const indexDocument = async(document) => {
                         frequency
                     }
                 }
-            }
+            },
             {upsert:true}
         )
     }
