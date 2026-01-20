@@ -1,6 +1,6 @@
 const express = require('express')
 const {search} = require('../services/search.services')
-
+const {trackSearchQuery} = require('../services/analytics.services')
 const router = express.Router()
 
 router.get('/',async(req,res)=>{
@@ -14,6 +14,9 @@ router.get('/',async(req,res)=>{
 
     try{
         const {totalResults, results} = await search(q, pageNum, limitNum)
+
+        trackSearchQuery(q)
+
         res.json({query: q,
             page: pageNum,
             limit: limitNum,
