@@ -4,15 +4,22 @@ const {search} = require('../services/search.services')
 const router = express.Router()
 
 router.get('/',async(req,res)=>{
-    const {q} = req.query
+    const {q, page = 1, limit = 10} = req.query
+    const pageNum = Math.max(parseInt(page), 1)
+    const limitNum = Math.min(parseInt(limit), 50)
 
     if(!q){
         return res.status(400).json({error:'query parameter q is required'})
     }
 
     try{
-        const reults = await search(q)
-        res.json({reults})
+        const {totalResults, results} = await search(q, pageNum, limitNum)
+        res.json({query: q,
+            page: pageNum,
+            limit: limitNum,
+            totalResults,
+            results
+        })
 
     }catch(err){
         console.error(err)
