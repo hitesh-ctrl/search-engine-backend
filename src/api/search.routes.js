@@ -4,14 +4,13 @@ const {trackSearchQuery} = require('../services/analytics.services')
 const router = express.Router()
 
 router.get('/',async(req,res)=>{
-    const {q, page = 1, limit = 10} = req.query
-    const pageNum = Math.max(parseInt(page), 1)
-    const limitNum = Math.min(parseInt(limit), 50)
-
-    if(!q){
+    const rawQuery = req.query.q;
+    const pageNum = req.query.page ?? 1;
+    const limitNum = req.query.limit ?? 10;
+    if(!rawQuery){
         return res.status(400).json({error:'query parameter q is required'})
     }
-
+    const q = rawQuery.trim().toLowerCase()
     try{
         const {totalResults, results} = await search(q, pageNum, limitNum)
 
@@ -21,7 +20,6 @@ router.get('/',async(req,res)=>{
             page: pageNum,
             limit: limitNum,
             totalResults,
-            results
         })
 
     }catch(err){

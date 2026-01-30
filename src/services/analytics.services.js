@@ -1,6 +1,9 @@
+
 const Analytics = require('../models/analytics.model')
 
 const trackSearchQuery = async(query) =>{
+    if(!query)
+        return
     try{
         await Analytics.updateOne(
             {query},

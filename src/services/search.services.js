@@ -1,8 +1,8 @@
 const Index = require('../models/index.model')
 const Document = require('../models/document.model')
 const {tokenize} = require('../utils/tokenizer')
-
-const search = async(query) => {
+const {paginate} = require('../utils/pagination')
+const search = async(query,page = 1, limit = 10) => {
     const terms = tokenize(query)
 
     if (terms.length == 0)
@@ -21,7 +21,11 @@ const search = async(query) => {
     }
     const sortedResults = Object.entries(scoreMap).sort((a,b) => b[1] - a[1])
 
-    const documentIds = sortedResults.map(([docId])=>docId)
+    const totalResults = sortedResults.length
+
+    const paginatedResults = paginate(sortedResults, page, limit)
+
+    const documentIds = paginatedResults.map(([docId])=>docId)
 
     const documents = await Document.find({
         _id:{$in:documentIds}
@@ -32,11 +36,17 @@ const search = async(query) => {
         documentMap[doc._id.toString()] = doc
     }
 
-    return sortedResults.map(([docId,score]) => ({
+    const results =  paginatedResults.map(([docId,score]) => {
+        const doc = documentMap[docId].title;
+        if(!doc) return null;
+        return {
         id: docId,
         title: documentMap[docId].title,
         score
-    }))
+        }
+}).filter(Boolean)
+
+    return {totalResults, results}
 }
 
 module.exports = {search}

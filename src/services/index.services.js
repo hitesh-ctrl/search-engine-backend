@@ -2,6 +2,7 @@ const index = require('../models/index.model')
 const {tokenize} = require('../utils/tokenizer.js')
 
 const indexDocument = async(document) => {
+    console.log('INDEXING DOC: ', document._id)
     const text = `${document.title} ${document.content}`
     const tokens = tokenize(text)
 
@@ -12,7 +13,7 @@ const indexDocument = async(document) => {
     }
 
     for(const [term, frequency] of Object.entries(frequencyMap)){
-        await index,updateOne(
+        await index.updateOne(
             {term},
             {
                 $push:{
